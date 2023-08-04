@@ -1,6 +1,7 @@
 package com.svg.D2Back.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
@@ -13,8 +14,12 @@ import java.io.IOException;
 public class DisplayPropertiesConverter implements AttributeConverter<DisplayProperties, String> {
 
     private static final Logger logger = LoggerFactory.getLogger(DisplayPropertiesConverter.class);
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper ;
 
+    public DisplayPropertiesConverter() {
+        objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
     @Override
     public String convertToDatabaseColumn(DisplayProperties displayProperties) {
         String jsonString = "";

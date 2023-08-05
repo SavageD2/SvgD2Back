@@ -1,5 +1,6 @@
 package com.svg.D2Back.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.svg.D2Back.Errors.RessourceNotFoundException;
 import com.svg.D2Back.entity.Item;
 import com.svg.D2Back.projection.ItemProjection;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -36,10 +38,8 @@ public class ItemController {
     }
 
     @GetMapping("/filter")
-    public List<Item> searchItems(@RequestParam(required = false) String name){
-        if (name != null) {
-            return itemService.findItemsByName(name);
-        }
-        return itemService.findAllItems();
+    public ResponseEntity<List<Item>> searchItems(@RequestParam String name) throws SQLException, JsonProcessingException {
+        List<Item> items = itemService.findItemsByName(name);
+        return ResponseEntity.ok(items);
     }
 }

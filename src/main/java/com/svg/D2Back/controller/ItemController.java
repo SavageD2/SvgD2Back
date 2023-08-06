@@ -1,7 +1,7 @@
 package com.svg.D2Back.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.svg.D2Back.Errors.RessourceNotFoundException;
+import com.svg.D2Back.Errors.ResourceNotFoundException;
 import com.svg.D2Back.entity.Item;
 import com.svg.D2Back.projection.ItemProjection;
 import com.svg.D2Back.repository.ItemRepository;
@@ -32,7 +32,7 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemProjection> getItem(@PathVariable Integer itemId){
         ItemProjection item = itemRepository.findByHash(itemId)
-                .orElseThrow(() -> new RessourceNotFoundException("Item", "hash", itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Item", "hash", itemId));
         return new ResponseEntity<>(item, HttpStatus.OK);
 
     }

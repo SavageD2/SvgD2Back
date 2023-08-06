@@ -1,6 +1,6 @@
 package com.svg.D2Back.controller;
 
-import com.svg.D2Back.Errors.RessourceNotFoundException;
+import com.svg.D2Back.Errors.ResourceNotFoundException;
 import com.svg.D2Back.entity.DestinyStatDefinition;
 import com.svg.D2Back.repository.StatRepository;
 import com.svg.D2Back.service.StatService;
@@ -32,7 +32,7 @@ public class StatController {
     public ResponseEntity<DestinyStatDefinition> getStatById(@PathVariable Integer statId) {
         Optional<DestinyStatDefinition> stat = statRepository.findById(statId);
         if (!stat.isPresent()) {
-            throw new RessourceNotFoundException("Stat not found", "statId", statId);
+            throw new ResourceNotFoundException("Stat not found", "statId", statId);
         }
         return ResponseEntity.ok(stat.get());
     }

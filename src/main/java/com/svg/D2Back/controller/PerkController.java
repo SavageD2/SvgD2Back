@@ -1,6 +1,6 @@
 package com.svg.D2Back.controller;
 
-import com.svg.D2Back.Errors.RessourceNotFoundException;
+import com.svg.D2Back.Errors.ResourceNotFoundException;
 import com.svg.D2Back.entity.DestinySandboxPerkDefinition;
 import com.svg.D2Back.repository.PerkRepository;
 import com.svg.D2Back.service.PerkService;
@@ -34,7 +34,7 @@ public class PerkController {
     public ResponseEntity<DestinySandboxPerkDefinition> getPerkById(@PathVariable Integer perkId) {
         Optional<DestinySandboxPerkDefinition> perk = perkRepository.findById(perkId);
         if (!perk.isPresent()) {
-            throw new RessourceNotFoundException("Perk","not found", perkId);
+            throw new ResourceNotFoundException("Perk","not found", perkId);
         }
         return ResponseEntity.ok(perk.get());
     }

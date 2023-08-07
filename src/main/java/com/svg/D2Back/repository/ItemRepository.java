@@ -17,5 +17,9 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 
     Optional<ItemProjection> findByHash(Integer hash);
 
+    @Query(value = "SELECT * FROM DestinyInventoryItemDefinition WHERE JSON_EXTRACT(json, '$.itemType') = 3", nativeQuery = true)
+    List<Item> findWeapons();
+
+
 
 }

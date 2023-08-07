@@ -1,6 +1,8 @@
 package com.svg.D2Back.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.svg.D2Back.Errors.ResourceNotFoundException;
 import com.svg.D2Back.entity.Item;
 import com.svg.D2Back.projection.ItemProjection;
@@ -11,11 +13,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/items")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ItemController {
     @Autowired
     private ItemService itemService;
@@ -42,4 +47,10 @@ public class ItemController {
         List<Item> items = itemService.findItemsByName(name);
         return ResponseEntity.ok(items);
     }
+
+    @GetMapping("/w")
+    public List<Item> getWeapons() {
+        return itemRepository.findWeapons();
+    }
+
 }

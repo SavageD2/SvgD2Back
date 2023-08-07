@@ -7,8 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class DisplayPropertiesConverter implements AttributeConverter<DisplayProperties, String> {

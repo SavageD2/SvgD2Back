@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.svg.D2Back.entity.DisplayProperties;
 import com.svg.D2Back.entity.Item;
+import com.svg.D2Back.projection.ItemJsonDTO;
 import com.svg.D2Back.projection.ItemProjection;
+import com.svg.D2Back.projection.ItemProjectionImpl;
 import com.svg.D2Back.repository.ItemRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -19,42 +21,52 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
     @Autowired
     private ItemRepository itemRepository;
 
-    @Autowired
-    private DataSource dataSource;
-
-    public List<ItemProjection> findAll() {
-        return itemRepository.findItemsWithSelectedColumns();
+    public List<ItemProjection> findByItemNameContaining(String name) {
+        name = "%" + name + "%";
+        List<Object[]> rawData = itemRepository.findByNameContaining(name);
+        return convertToProjection(rawData);
     }
 
-    public List<Item> findItemsByName(String name) throws SQLException, JsonProcessingException {
-        List<Item> items = new ArrayList<>();
-        String sql = "SELECT * FROM DestinyInventoryItemDefinition WHERE json_extract(json, '$.displayProperties.name')=?";
-        ObjectMapper mapper = new ObjectMapper();
-        try(Connection conn = dataSource.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            try(ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Item item = new Item();
-                    item.setHash(rs.getInt("id"));
-                    String jsonContent = rs.getString("json");
-                    JsonNode jsonNode = mapper.readTree(jsonContent);
-                    JsonNode displayPropertiesNode = jsonNode.path("displayProperties");
-                    DisplayProperties displayProperties = mapper.treeToValue(displayPropertiesNode, DisplayProperties.class);
-                    item.setDisplayProperties(displayProperties);
-                    items.add(item);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return items;
-        }
+    public List<ItemJsonDTO> findWeapons() {
+        List<Object[]> data = itemRepository.findWeaponJsons();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        return data.stream()
+                .map(entry -> {
+                    try {
+                        ItemJsonDTO item = objectMapper.readValue((String) entry[1], ItemJsonDTO.class);
+                        item.setHash((Number) entry[0]);
+                        return item;
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItemProjection> convertToProjection(List<Object[]> rawData) {
+        return rawData.stream().map(data -> {
+            Integer hash = (Integer) data[0];
+            String name = (String) data[1];
+            String description = (String) data[2];
+            String icon = (String) data[3];
+            Boolean hasIcon = Boolean.parseBoolean((String) data[4]);
+            String iconWatermark = (String) data[5];
+
+            DisplayProperties displayProperties = new DisplayProperties(name, description, icon, hasIcon);
+
+            return new ItemProjectionImpl(hash, displayProperties, iconWatermark);
+        }).collect(Collectors.toList());
     }
 
 }

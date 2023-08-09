@@ -8,16 +8,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DisplayProperties {
 
-    @JsonProperty("description")
+
     private String description;
-    @JsonProperty("name")
+
     private String name;
-    @JsonProperty("icon")
+
     private String icon;
-    @JsonProperty("hasIcon")
+
     private boolean hasIcon;
+    public DisplayProperties(String name, String description, String icon, boolean hasIcon) {
+        this.name = name;
+        this.description = description;
+        this.icon = icon;
+        this.hasIcon = hasIcon;
+    }
+
 }

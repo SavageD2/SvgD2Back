@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.svg.D2Back.Errors.ResourceNotFoundException;
 import com.svg.D2Back.entity.Item;
+import com.svg.D2Back.projection.ItemJsonDTO;
 import com.svg.D2Back.projection.ItemProjection;
 import com.svg.D2Back.repository.ItemRepository;
 import com.svg.D2Back.service.ItemService;
@@ -29,28 +30,28 @@ public class ItemController {
     private ItemRepository itemRepository;
 
     @GetMapping("")
-    public ResponseEntity<List<ItemProjection>> getItems(){
-        List<ItemProjection> items = itemService.findAll();
-        return new ResponseEntity<>(items, HttpStatus.OK);
+    public ResponseEntity<List<ItemProjection>> getItems() {
+        List<Object[]> rawData = itemRepository.findAllData();
+        List<ItemProjection> projections = itemService.convertToProjection(rawData);
+        return new ResponseEntity<>(projections, HttpStatus.OK);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemProjection> getItem(@PathVariable Integer itemId){
-        ItemProjection item = itemRepository.findByHash(itemId)
+    public ResponseEntity<Item> getItem(@PathVariable Integer itemId){
+        Item item = itemRepository.findByHash(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "hash", itemId));
         return new ResponseEntity<>(item, HttpStatus.OK);
 
     }
-
-    @GetMapping("/filter")
-    public ResponseEntity<List<Item>> searchItems(@RequestParam String name) throws SQLException, JsonProcessingException {
-        List<Item> items = itemService.findItemsByName(name);
-        return ResponseEntity.ok(items);
+    @GetMapping("/w")
+    public List<ItemJsonDTO> getWeapons() {
+        return itemService.findWeapons();
     }
 
-    @GetMapping("/w")
-    public List<Item> getWeapons() {
-        return itemRepository.findWeapons();
+    @GetMapping("/search")
+    public ResponseEntity<List<ItemProjection>> getItemsByName(@RequestParam String name) {
+        List<ItemProjection> projections = itemService.findByItemNameContaining(name);
+        return new ResponseEntity<>(projections, HttpStatus.OK);
     }
 
 }

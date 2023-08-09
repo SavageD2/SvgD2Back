@@ -18,7 +18,6 @@ public class Item {
     @Column(name = "id")
     private Integer hash;
 
-    @Column(name = "json")
-    @Convert(converter = DisplayPropertiesConverter.class)
-    private DisplayProperties displayProperties;
+    @Column(name = "json", columnDefinition = "TEXT")
+    private String jsonContent;
 }

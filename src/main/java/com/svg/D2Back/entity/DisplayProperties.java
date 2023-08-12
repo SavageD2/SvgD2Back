@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DisplayProperties {

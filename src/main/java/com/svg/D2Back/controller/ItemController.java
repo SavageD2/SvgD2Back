@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.svg.D2Back.Errors.ResourceNotFoundException;
 import com.svg.D2Back.entity.Item;
+import com.svg.D2Back.projection.ItemContentProjection;
 import com.svg.D2Back.projection.ItemJsonDTO;
 import com.svg.D2Back.projection.ItemProjection;
 import com.svg.D2Back.repository.ItemRepository;
@@ -36,22 +37,26 @@ public class ItemController {
         return new ResponseEntity<>(projections, HttpStatus.OK);
     }
 
-    @GetMapping("/{itemId}")
-    public ResponseEntity<Item> getItem(@PathVariable Integer itemId){
-        Item item = itemRepository.findByHash(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Item", "hash", itemId));
-        return new ResponseEntity<>(item, HttpStatus.OK);
-
-    }
     @GetMapping("/w")
     public List<ItemJsonDTO> getWeapons() {
         return itemService.findWeapons();
+
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemProjection>> getItemsByName(@RequestParam String name) {
         List<ItemProjection> projections = itemService.findByItemNameContaining(name);
         return new ResponseEntity<>(projections, HttpStatus.OK);
+    }
+
+    @GetMapping("/w/{id}")
+    public ResponseEntity<ItemJsonDTO> getWeaponById(@PathVariable Integer id) {
+        ItemJsonDTO weapon = itemService.getWeaponById(id);
+        if (weapon != null) {
+            return new ResponseEntity<>(weapon, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }

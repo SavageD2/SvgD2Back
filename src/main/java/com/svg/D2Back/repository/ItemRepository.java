@@ -1,6 +1,8 @@
 package com.svg.D2Back.repository;
 
 import com.svg.D2Back.entity.Item;
+import com.svg.D2Back.projection.ItemContentProjection;
+import com.svg.D2Back.projection.ItemJsonDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,10 +32,11 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             "FROM DestinyInventoryItemDefinition i WHERE JSON_EXTRACT(i.json, '$.displayProperties.name') LIKE :name AND JSON_EXTRACT(i.json, '$.itemType') = 3 ", nativeQuery = true)
     List<Object[]> findByNameContaining(@Param("name") String name); //ma requête pour filtrer les armes par nom
 
-    @Query("SELECT i FROM Item i WHERE i.hash = :hash")
-    Optional<Item> findByHash(@Param("hash") Integer hash);
 
-    @Query(value = "SELECT i.id, i.json FROM DestinyInventoryItemDefinition i WHERE JSON_EXTRACT(i.json, '$.itemType') = 3", nativeQuery = true)
+    @Query(value = "SELECT i.id, i.json, JSON_EXTRACT(i.json, '$.stats') as stats FROM DestinyInventoryItemDefinition i WHERE JSON_EXTRACT(i.json, '$.itemType') = 3\n", nativeQuery = true)
     List<Object[]> findWeaponJsons();
+
+    @Query(value = "SELECT i.id, i.json, JSON_EXTRACT(i.json, '$.stats') as stats FROM DestinyInventoryItemDefinition i WHERE i.id = :id AND JSON_EXTRACT(i.json, '$.itemType') = 3", nativeQuery = true)
+    Optional<Object[]> findWeaponJsonById(@Param("id") Integer id);
 
 }

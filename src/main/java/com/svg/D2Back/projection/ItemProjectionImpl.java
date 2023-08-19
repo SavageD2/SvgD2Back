@@ -1,6 +1,7 @@
 package com.svg.D2Back.projection;
 
 import com.svg.D2Back.entity.DisplayProperties;
+import com.svg.D2Back.entity.Stats;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

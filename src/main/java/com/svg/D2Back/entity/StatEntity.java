@@ -1,7 +1,9 @@
 package com.svg.D2Back.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,9 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class DestinySandboxPerkDefinition {
+@Table(name = "DestinyStatDefinition")
+public class StatEntity {
 
     @Id
-    private Integer id;
+    @Column(name = "id")
+    private Integer hash;
+
+    @Column(name = "json")
     private String json;
 }

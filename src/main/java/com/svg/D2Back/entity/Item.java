@@ -1,7 +1,5 @@
 package com.svg.D2Back.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.svg.D2Back.projection.ItemProjection;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

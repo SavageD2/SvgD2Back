@@ -5,10 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.svg.D2Back.entity.DisplayProperties;
 import com.svg.D2Back.entity.Item;
+import com.svg.D2Back.entity.StatEntity;
+import com.svg.D2Back.entity.Stats;
 import com.svg.D2Back.projection.ItemJsonDTO;
 import com.svg.D2Back.projection.ItemProjection;
 import com.svg.D2Back.projection.ItemProjectionImpl;
+import com.svg.D2Back.projection.StatEntityDTO;
 import com.svg.D2Back.repository.ItemRepository;
+import com.svg.D2Back.repository.StatEntityRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +23,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
     @Autowired
     private ItemRepository itemRepository;
+    @Autowired
+    private StatEntityRepository statEntityRepository;
+
 
     public List<ItemProjection> findByItemNameContaining(String name) {
         name = "%" + name + "%";
@@ -39,11 +44,36 @@ public class ItemService {
         List<Object[]> data = itemRepository.findWeaponJsons();
         ObjectMapper objectMapper = new ObjectMapper();
 
+        List<StatEntity> statEntities = statEntityRepository.findAll();
+        Map<Integer, StatEntityDTO> statDetails = statEntities.stream()
+                .collect(Collectors.toMap(
+                        StatEntity::getHash,
+                        entity -> {
+                            try {
+                                return objectMapper.readValue(entity.getJson(), StatEntityDTO.class);
+                            } catch (JsonProcessingException e) {
+                                e.printStackTrace();
+                                return null;
+                            }
+                        }
+                ));
+
         return data.stream()
                 .map(entry -> {
                     try {
                         ItemJsonDTO item = objectMapper.readValue((String) entry[1], ItemJsonDTO.class);
+                        Stats stats = objectMapper.readValue((String) entry[2], Stats.class);
+
+                        stats.getStats().values().forEach(stat -> {
+                           StatEntityDTO details = statDetails.get(stat.getStatHash().intValue());
+                           if (details!= null) {
+                               stat.setName(details.getDisplayProperties().getName());
+                               stat.setDescription(details.getDisplayProperties().getDescription());
+                           }
+                        });
+
                         item.setHash((Number) entry[0]);
+                        item.setStats(stats);
                         return item;
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
@@ -67,6 +97,13 @@ public class ItemService {
 
             return new ItemProjectionImpl(hash, displayProperties, iconWatermark);
         }).collect(Collectors.toList());
+    }
+
+    public ItemJsonDTO getWeaponById(Integer weaponId) {
+        return findWeapons().stream()
+                .filter(item -> weaponId.equals(item.getHash()))
+                .findFirst()
+                .orElse(null);
     }
 
 }

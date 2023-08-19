@@ -29,9 +29,9 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             "JSON_EXTRACT(i.json, '$.displayProperties.icon') AS icon, " +
             "CASE WHEN JSON_EXTRACT(i.json, '$.displayProperties.hasIcon') = 1 THEN 'true' ELSE 'false' END AS hasIcon, " +
             "JSON_EXTRACT(i.json, '$.iconWatermark') AS iconWatermark " +
-            "FROM DestinyInventoryItemDefinition i WHERE JSON_EXTRACT(i.json, '$.displayProperties.name') LIKE :name AND JSON_EXTRACT(i.json, '$.itemType') = 3 ", nativeQuery = true)
-    List<Object[]> findByNameContaining(@Param("name") String name); //ma requête pour filtrer les armes par nom
 
+            "FROM DestinyInventoryItemDefinition i WHERE JSON_EXTRACT(i.json, '$.displayProperties.name') LIKE :name AND JSON_EXTRACT(i.json, '$.itemType') = 3 ", nativeQuery = true)
+    List<Object[]> findByNameContaining(@Param("name") String name);
 
     @Query(value = "SELECT i.id, i.json, JSON_EXTRACT(i.json, '$.stats') as stats FROM DestinyInventoryItemDefinition i WHERE JSON_EXTRACT(i.json, '$.itemType') = 3\n", nativeQuery = true)
     List<Object[]> findWeaponJsons();
